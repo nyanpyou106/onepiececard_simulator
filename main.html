@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Card Game Simulator</title>
+	<title>ONEPIECE CARD SIMULATOR</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css">
 		body {
@@ -29,6 +29,7 @@
 			justify-content: center;
 			align-items: center;
 			gap: 10px;
+			margin-bottom: 10px;
 		}
 		.leader {
 			display: flex;
@@ -165,36 +166,56 @@
                 });
             }
 
-			// 手札から場のカードドラドロ
-            var dragImage = null;
-            var hand_images = document.getElementsByClassName("hand");
-            var field_images = document.getElementsByClassName("field");
-            for (var i = 0; i < hand_images.length; i++) {
-                hand_images[i].addEventListener("dragstart", function(e) {
-					dragImage = this;
-                });
-                hand_images[i].addEventListener("dragover", function(e) {
-                    e.preventDefault();
-                });
-            }
-            for (var i = 0; i < field_images.length; i++) {
-                field_images[i].addEventListener("dragover", function(e) {
-                    e.preventDefault();
-                });
-                field_images[i].addEventListener("drop", function(e) {
-                    e.preventDefault();
-					// ブランクをドロップしようとしている時は何もしない。
-					if(dragImage.classList.contains("blank")){
-							;
+			// カードのドラドロ
+			// 手札とライフとstackでの動作
+            var DRAG_IMAGE_ELEMENT = null;
+            var card_images = document.getElementsByClassName("card");
+            for (var i = 0; i < card_images.length; i++) {
+                card_images[i].addEventListener("dragstart", function(e) {
+					if(this.dataset.card=="don"||this.dataset.card==""){
+						// ドンをドラッグしようとしている時とブランクをドラッグしようとしている時は何もしない
+						;
 					}else{
-						// ドロップ先の画像を変更
-                    	this.src = dragImage.src;
-						// ドロップ元の画像をブランクに変更
-						dragImage.src = blank_img_src;
-						dragImage.classList.add("blank");
+						DRAG_IMAGE_ELEMENT = this;
+						console.log(DRAG_IMAGE_ELEMENT);
 					}
 				});
-            }
+                card_images[i].addEventListener("dragover", function(e) {
+                    e.preventDefault();
+                });
+				card_images[i].addEventListener("drop", function(e) {
+                    e.preventDefault();
+					if(this.dataset.card==""&&DRAG_IMAGE_ELEMENT!==null){
+						// ドロップ先がブランクかつドラッグ元がnullじゃない時だけドロップ可能。
+						// ドロップ先の画像を変更してblank属性削除
+                    	this.dataset.card = DRAG_IMAGE_ELEMENT.dataset.card;
+						this.src = this.dataset.card;
+						this.classList.remove("blank");
+						// ドロップ元の画像をブランクに変更してblank属性付与
+						DRAG_IMAGE_ELEMENT.dataset.card = "";
+						DRAG_IMAGE_ELEMENT.src = blank_img_src;
+						DRAG_IMAGE_ELEMENT.classList.add("blank");
+						// 初期化
+						DRAG_IMAGE_ELEMENT = null;
+					}
+				});
+			}
+			// トラッシュでの動作
+			trash = document.getElementById("trash")
+			trash.addEventListener("dragover", function(e) {
+                e.preventDefault();
+            });
+			trash.addEventListener("drop", function(e) {
+				if(DRAG_IMAGE_ELEMENT!==null){
+					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
+					// ドロップ元の画像をブランクに変更してblank属性付与
+					DRAG_IMAGE_ELEMENT.dataset.card = "";
+					DRAG_IMAGE_ELEMENT.src = blank_img_src;
+					DRAG_IMAGE_ELEMENT.classList.add("blank");
+					// 初期化
+					DRAG_IMAGE_ELEMENT = null;
+				}
+			});
 
 			// デッキからblankの手札に1ドロー
 			var blank_hand_cards = document.getElementsByClassName("card hand blank");
@@ -207,7 +228,8 @@
 						if(blank_hand_cards[i].classList.contains("blank")){
 							// デッキリストの先頭を抜き出して手札に画像を表示
 							var card_number = deck_list.shift();
-							blank_hand_cards[i].src = "images/cards/" + card_number + ".png";
+							blank_hand_cards[i].dataset.card = "images/cards/" + card_number + ".png";
+							blank_hand_cards[i].src = blank_hand_cards[i].dataset.card;
 							blank_hand_cards[i].classList.remove("blank");
 							return
 						}
@@ -295,71 +317,73 @@
 		</div>
 		<div class="mainframe">
 			<div class="card-container">
-				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
 			</div>
 			<div class="card-container">
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
-				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
 			</div>
 			<div class="card-container">
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
 			</div>
 			<div class="card-container">
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
 			</div>
 			<div class="controls">
 				<button id="DrawButton">1枚引く</button>
 				<button id="AddDonButton">+1ドン</button>
+				<button id="RemoveDonButton">-1ドン</button>
 				<button id="AddLifeButton">+1ライフ</button>
+				<button id="CheckDeckTopButton">デッキ上確認</button>
 				<input id="DeckURLInput" type="text" value="https://mokeymokey.com/simulator/make_image?decklist=[%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-011%22,%22ST01-011%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22]&leader=OP01-002"></input>
 				<button id="DeckSetButton">デッキ読み込み</button>
 			</div>
 		</div>
 		<div class="subframeright">
 			<div class="stack">
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
 			</div>
 			<div class="trash">
-				<img src="images/trash-image.jpg" class="trashcard"></img>
+				<img src="images/trash-image.jpg" id="trash" class="trashcard"></img>
 			</div>
 			<div class="deck">
-				<img src="images/deck-top-image.jpg" class="deckcard"></img>
-				<img src="images/deck-bottom-image.jpg" class="deckcard"></img>
+				<img src="images/deck-top-image.jpg" id="decktop" class="deckcard"></img>
+				<img src="images/deck-bottom-image.jpg" id="deckbottom" class="deckcard"></img>
 			</div>
 		</div>
 	</div>
