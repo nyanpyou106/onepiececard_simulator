@@ -59,7 +59,7 @@
 			justify-content: center;
 			align-items: center;
 			gap: 10px;
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 		}
 		.trash {
 			display: flex;
@@ -67,7 +67,7 @@
 			justify-content: center;
 			align-items: center;
 			gap: 10px;
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 		}
 		.deck {
 			display: flex;
@@ -75,7 +75,7 @@
 			justify-content: center;
 			align-items: center;
 			gap: 10px;
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 		}
 		.card {
 			display: inline-block;
@@ -225,19 +225,33 @@
 				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
 				if(deck_list.length>0){
 					for (var i = 0; i < blank_hand_cards.length; i++) {
-						if(blank_hand_cards[i].classList.contains("blank")){
-							// デッキリストの先頭を抜き出して手札に画像を表示
-							var card_number = deck_list.shift();
-							blank_hand_cards[i].dataset.card = "images/cards/" + card_number + ".png";
-							blank_hand_cards[i].src = blank_hand_cards[i].dataset.card;
-							blank_hand_cards[i].classList.remove("blank");
-							return
-						}
+						// デッキリストの先頭を抜き出して手札に画像を表示
+						var card_number = deck_list.shift();
+						blank_hand_cards[i].dataset.card = "images/cards/" + card_number + ".png";
+						blank_hand_cards[i].src = blank_hand_cards[i].dataset.card;
+						blank_hand_cards[i].classList.remove("blank");
+						return
 					}
 				}
 			});
 
-			
+			// blankのスタックに1ドローしてデッキ上確認
+			var BLANK_STACK_CARDS = document.getElementsByClassName("card stack blank");
+			var CHECK_DECK_TOP_BUTTON = document.getElementById("CheckDeckTopButton");
+			// ドローしたカードの画像に切り替える
+			CHECK_DECK_TOP_BUTTON.addEventListener("click", function() {
+				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
+				if(deck_list.length>0){
+					for (var i = 0; i < BLANK_STACK_CARDS.length; i++) {
+						// デッキリストの先頭を抜き出してスタックに画像を表示
+						var card_number = deck_list.shift();
+						BLANK_STACK_CARDS[i].dataset.card = "images/cards/" + card_number + ".png";
+						BLANK_STACK_CARDS[i].src = BLANK_STACK_CARDS[i].dataset.card;
+						BLANK_STACK_CARDS[i].classList.remove("blank");
+						return
+					}
+				}
+			});
 
 			// ドン追加
 			var blank_don_cards = document.getElementsByClassName("card fieldcard don blank");
@@ -349,28 +363,28 @@
 				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
 			</div>
 			<div class="card-container">
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 			</div>
 			<div class="card-container">
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 			</div>
 			<div class="controls">
 				<button id="DrawButton">1枚引く</button>
@@ -384,12 +398,12 @@
 		</div>
 		<div class="subframeright">
 			<div class="stack">
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
-				<img src="images/blank-image.jpg" data-card="" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
 			</div>
 			<div class="trash">
 				<img src="images/trash-image.jpg" id="trash" class="trashcard"></img>
