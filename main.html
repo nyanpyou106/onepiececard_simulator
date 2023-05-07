@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Card Game Simulator</title>
+	<style type="text/css">
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+		}
+		.baseframe {
+			display: flex;
+			flex-direction: row;
+		}
+		.subframeleft {
+			width: 15%;
+			padding-left: 2.5%;
+		}
+		.mainframe {
+			width: 70%;
+		}
+		.subframeright {
+			width: 15%;
+		}
+		.card-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+		.card {
+			display: inline-block;
+			height: 150px;
+			width: 100px;
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
+			transition: transform 0.5s;
+		}
+		.field {
+			display: inline-block;
+			height: 210px;
+			width: 140px;
+			padding-left: 30px;
+			padding-right: 30px;
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
+			transition: transform 0.5s;
+		}
+		.leadercard {
+			height: 300px;
+			width: 200px;
+		}
+		.card.rotate {
+			transform: rotateZ(90deg);
+		}
+		button {
+			margin-top: 10px;
+			padding: 5px 10px;
+			font-size: 18px;
+			border-radius: 5px;
+			background-color: #007bff;
+			color: #fff;
+			border: none;
+			cursor: pointer;
+		}
+		input {
+			margin-top: 10px;
+			padding: 5px 10px;
+			font-size: 18px;
+			border-radius: 5px;
+		}
+	</style>
+	<script type="text/javascript">
+
+		// 便利関数色々
+		function get_filename_from_fullpath(fullpath){
+			return fullpath.split("/").pop(); 
+		}
+
+		function shuffle_array(array) {
+			for (let i = array.length - 1; i > 0; i--) {
+    		const j = Math.floor(Math.random() * (i + 1));
+    		[array[i], array[j]] = [array[j], array[i]];
+  			}
+  			return array;
+		}
+
+		// 処理本体
+		var blank_img_src = "images/blank-image.jpg";
+		var face_down_img_src = "images/face-down-image.jpg";
+		var don_img_src = "images/don-image.jpg";
+		var deck_list = [];
+
+        window.onload = function() {
+			// カード回転
+            var cards = document.getElementsByClassName("fieldcard");
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].addEventListener("click", function() {
+					// blankクラスを持っている場合は起動しない
+                    if (!this.classList.contains("blank")){
+						if (this.classList.contains("rotate")) {
+							this.classList.remove("rotate");
+						} else {
+							this.classList.add("rotate");
+						}
+					}
+                });
+            }
+
+			// 手札から場のカードドラドロ
+            var dragImage = null;
+            var hand_images = document.getElementsByClassName("hand");
+            var field_images = document.getElementsByClassName("field");
+            for (var i = 0; i < hand_images.length; i++) {
+                hand_images[i].addEventListener("dragstart", function(e) {
+					dragImage = this;
+                });
+                hand_images[i].addEventListener("dragover", function(e) {
+                    e.preventDefault();
+                });
+            }
+            for (var i = 0; i < field_images.length; i++) {
+                field_images[i].addEventListener("dragover", function(e) {
+                    e.preventDefault();
+                });
+                field_images[i].addEventListener("drop", function(e) {
+                    e.preventDefault();
+					// ブランクをドロップしようとしている時は何もしない。
+					if(dragImage.classList.contains("blank")){
+							;
+					}else{
+						// ドロップ先の画像を変更
+                    	this.src = dragImage.src;
+						// ドロップ元の画像をブランクに変更
+						dragImage.src = blank_img_src;
+						dragImage.classList.add("blank");
+					}
+				});
+            }
+
+			// デッキからblankの手札に1ドロー
+			var blank_hand_cards = document.getElementsByClassName("card hand blank");
+			var draw_button = document.getElementById("DrawButton");
+			// ドローしたカードの画像に切り替える
+			draw_button.addEventListener("click", function() {
+				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
+				if(deck_list.length>0){
+					for (var i = 0; i < blank_hand_cards.length; i++) {
+						if(blank_hand_cards[i].classList.contains("blank")){
+							// デッキリストの先頭を抜き出して手札に画像を表示
+							var card_number = deck_list.shift();
+							blank_hand_cards[i].src = "images/cards/" + card_number + ".png";
+							blank_hand_cards[i].classList.remove("blank");
+							return
+						}
+					}
+				}
+			});
+
+			// ドン追加
+			var blank_don_cards = document.getElementsByClassName("card fieldcard don blank");
+			var add_don_button = document.getElementById("AddDonButton");
+			// ドローしたカードの画像に切り替える
+			add_don_button.addEventListener("click", function() {
+				for (var i = 0; i < blank_don_cards.length; i++) {
+					if(blank_don_cards[i].classList.contains("blank")){
+						blank_don_cards[i].src = don_img_src;
+						blank_don_cards[i].classList.remove("blank");
+						return
+					}
+				}
+			});
+
+			// ドン減少
+
+			// デッキ読み込み
+			// mokeymokeyの画像出力URLからデッキリストを作製してリストに放り込む
+			var deck_set_button = document.getElementById("DeckSetButton");
+			deck_set_button.addEventListener("click", function() {
+				var deck_url_input = document.getElementById("DeckURLInput").value;
+				// URLからデッキ内容だけを分離
+				var regex = /\[(.*?)\]/
+				deck_list = deck_url_input.match(regex)[1];
+				// %22(")を全て削除
+				deck_list = deck_list.replace(/%22/g, "");
+				// シャッフルしつつdeck_listに投入
+				deck_list = shuffle_array(deck_list.split(","));
+				// URLからリーダーカードだけを分離
+				var regex = /&leader=([^&]+)/;
+				var leader_card_number = deck_url_input.match(regex)[1];
+				// リーダーカードをセット
+				var leader_card = document.getElementById("myleader");
+				leader_card.classList.remove("blank");
+				leader_card.src = "images/cards/" + leader_card_number + ".png";
+			});
+
+
+        }
+	</script>
+</head>
+<body>
+	<div class="baseframe">
+		<div class="subframeleft">
+			<div class="life">
+				<img src="images/blank-image.jpg" class="card life blank"></img>
+				<img src="images/blank-image.jpg" class="card life blank"></img>
+				<img src="images/blank-image.jpg" class="card life blank"></img>
+				<img src="images/blank-image.jpg" class="card life blank"></img>
+				<img src="images/blank-image.jpg" class="card life blank"></img>
+				<img src="images/blank-image.jpg" class="card life blank"></img>
+			</div>
+			<div class="leader">
+				<img src="images/face-down-image.jpg" id="myleader" class="card fieldcard leadercard blank"></img>
+			</div>
+		</div>
+		<div class="mainframe">
+			<div class="card-container">
+				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard field"></img>
+			</div>
+			<div class="card-container">
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+				<img src="images/blank-image.jpg" class="card fieldcard don blank"></img>
+			</div>
+			<div class="card-container">
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+			</div>
+			<div class="card-container">
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+			</div>
+		</div>
+		<div class="subframeright">
+			<div>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
+			</div>
+			<button id="DrawButton">1枚引く</button>
+			<button id="AddDonButton">1ドン増やす</button>
+			<input id="DeckURLInput" type="text" value="https://mokeymokey.com/simulator/make_image?decklist=[%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-011%22,%22ST01-011%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22]&leader=OP01-002"></input>
+			<button id="DeckSetButton">デッキ読み込み</button>
+			<div class="trash">
+				<img src="images/face-down-image.jpg" class="card blank"></img>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

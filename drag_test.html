@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Drag and Drop Example</title>
+	<style type="text/css">
+		img {
+			display: block;
+			height: 200px;
+			width: 200px;
+			margin: 50px auto;
+		}
+	</style>
+	<script type="text/javascript">
+		window.onload = function() {
+			var dragImage = null;
+			var images = document.getElementsByTagName("img");
+			for (var i = 0; i < images.length; i++) {
+				images[i].addEventListener("dragstart", function(e) {
+					dragImage = this;
+				});
+				images[i].addEventListener("dragover", function(e) {
+					e.preventDefault();
+				});
+				images[i].addEventListener("drop", function(e) {
+					e.preventDefault();
+					this.src = dragImage.src;
+				});
+			}
+		}
+	</script>
+</head>
+<body>
+	<img src="card-image.jpg" draggable="true">
+	<img src="don-image.jpg" draggable="false">
+</body>
+</html>
