@@ -237,21 +237,34 @@
 				}
 			});
 
+			
+
 			// ドン追加
 			var blank_don_cards = document.getElementsByClassName("card fieldcard don blank");
 			var add_don_button = document.getElementById("AddDonButton");
-			// ドローしたカードの画像に切り替える
+			// ドンカードの画像に切り替える
 			add_don_button.addEventListener("click", function() {
-				for (var i = 0; i < blank_don_cards.length; i++) {
-					if(blank_don_cards[i].classList.contains("blank")){
-						blank_don_cards[i].src = don_img_src;
-						blank_don_cards[i].classList.remove("blank");
-						return
-					}
+				// 最も若いインデックスをブランクからドンカードに変える
+				if(blank_don_cards.length!==0){
+					blank_don_cards[0].src = don_img_src;
+					blank_don_cards[0].classList.add("fielddon");
+					blank_don_cards[0].classList.remove("blank");
 				}
 			});
 
 			// ドン減少
+			var don_cards = document.getElementsByClassName("card fieldcard don fielddon");
+			var remove_don_button = document.getElementById("RemoveDonButton");
+			// ブランク画像に切り替える
+			remove_don_button.addEventListener("click", function() {
+				// 最も大きいインデックスをドンカードからブランクに変える
+				if(don_cards.length!==0){
+					max_index_field_don = don_cards[don_cards.length-1];
+					max_index_field_don.src = blank_img_src;
+					max_index_field_don.classList.remove("fielddon");
+					max_index_field_don.classList.add("blank");
+				}
+			});
 
 			// ライフ追加
 			var blank_life_cards = document.getElementsByClassName("card life blank");
