@@ -1,0 +1,2 @@
+# onepiececard_simulator
+ワンピースカードで一人回しするやつ
