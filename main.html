@@ -177,8 +177,9 @@
             var card_images = document.getElementsByClassName("card");
             for (var i = 0; i < card_images.length; i++) {
                 card_images[i].addEventListener("dragstart", function(e) {
-					if(this.dataset.card=="don"||this.dataset.card==""){
-						// ドンをドラッグしようとしている時とブランクをドラッグしようとしている時は何もしない
+					if(this.dataset.card=="don"||this.dataset.card==""||this.id=="myleader"){
+						// ドンをドラッグしようとしている時とブランクをドラッグしようとしている時と
+						// リーダーをドラッグしようとしている時は何もしない
 						;
 					}else{
 						DRAG_IMAGE_ELEMENT = this;
