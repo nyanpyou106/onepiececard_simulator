@@ -150,9 +150,9 @@
 		}
 
 		// 処理本体
-		var blank_img_src = "images/blank-image.jpg";
-		var face_down_img_src = "images/face-down-image.jpg";
-		var don_img_src = "images/don-image.jpg";
+		var BLANK_IMG_SRC = "images/blank-image.jpg";
+		var FACE_DOWN_IMG_SRC = "images/face-down-image.jpg";
+		var DON_IMG_SRC = "images/don-image.jpg";
 		var deck_list = [];
 
         window.onload = function() {
@@ -173,7 +173,7 @@
 
 			// カードのドラドロ
 			// 手札とライフとstackでの動作
-            var DRAG_IMAGE_ELEMENT = null;
+            var drag_image_element = null;
             var card_images = document.getElementsByClassName("card");
             for (var i = 0; i < card_images.length; i++) {
                 card_images[i].addEventListener("dragstart", function(e) {
@@ -182,8 +182,7 @@
 						// リーダーをドラッグしようとしている時は何もしない
 						;
 					}else{
-						DRAG_IMAGE_ELEMENT = this;
-						console.log(DRAG_IMAGE_ELEMENT);
+						drag_image_element = this;
 					}
 				});
                 card_images[i].addEventListener("dragover", function(e) {
@@ -191,35 +190,35 @@
                 });
 				card_images[i].addEventListener("drop", function(e) {
                     e.preventDefault();
-					if(this.dataset.card==""&&DRAG_IMAGE_ELEMENT!==null){
+					if(this.dataset.card==""&&drag_image_element!==null){
 						// ドロップ先がブランクかつドラッグ元がnullじゃない時だけドロップ可能。
 						// ドロップ先の画像を変更してblank属性削除
-                    	this.dataset.card = DRAG_IMAGE_ELEMENT.dataset.card;
+                    	this.dataset.card = drag_image_element.dataset.card;
 						this.src = this.dataset.card;
 						this.classList.remove("blank");
 						// ドロップ元の画像をブランクに変更してblank属性付与
-						DRAG_IMAGE_ELEMENT.dataset.card = "";
-						DRAG_IMAGE_ELEMENT.src = blank_img_src;
-						DRAG_IMAGE_ELEMENT.classList.add("blank");
+						drag_image_element.dataset.card = "";
+						drag_image_element.src = BLANK_IMG_SRC;
+						drag_image_element.classList.add("blank");
 						// 初期化
-						DRAG_IMAGE_ELEMENT = null;
+						drag_image_element = null;
 					}
 				});
 			}
 			// トラッシュでの動作
-			var trash = document.getElementById("trash")
-			trash.addEventListener("dragover", function(e) {
+			var TRASH = document.getElementById("trash")
+			TRASH.addEventListener("dragover", function(e) {
                 e.preventDefault();
             });
-			trash.addEventListener("drop", function(e) {
-				if(DRAG_IMAGE_ELEMENT!==null){
+			TRASH.addEventListener("drop", function(e) {
+				if(drag_image_element!==null){
 					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
 					// ドロップ元の画像をブランクに変更してblank属性付与
-					DRAG_IMAGE_ELEMENT.dataset.card = "";
-					DRAG_IMAGE_ELEMENT.src = blank_img_src;
-					DRAG_IMAGE_ELEMENT.classList.add("blank");
+					drag_image_element.dataset.card = "";
+					drag_image_element.src = BLANK_IMG_SRC;
+					drag_image_element.classList.add("blank");
 					// 初期化
-					DRAG_IMAGE_ELEMENT = null;
+					drag_image_element = null;
 				}
 			});
 
@@ -229,17 +228,17 @@
                 e.preventDefault();
             });
 			DECKTOP.addEventListener("drop", function(e) {
-				if(DRAG_IMAGE_ELEMENT!==null){
+				if(drag_image_element!==null){
 					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
 					// デッキリストの先頭にカード番号を追加
-					var card_number = card_number_from_image_path(DRAG_IMAGE_ELEMENT.dataset.card)
+					var card_number = card_number_from_image_path(drag_image_element.dataset.card)
 					deck_list.unshift(card_number);
 					// ドロップ元の画像をブランクに変更してblank属性付与
-					DRAG_IMAGE_ELEMENT.dataset.card = "";
-					DRAG_IMAGE_ELEMENT.src = blank_img_src;
-					DRAG_IMAGE_ELEMENT.classList.add("blank");
+					drag_image_element.dataset.card = "";
+					drag_image_element.src = BLANK_IMG_SRC;
+					drag_image_element.classList.add("blank");
 					// 初期化
-					DRAG_IMAGE_ELEMENT = null;
+					drag_image_element = null;
 				}
 			});
 
@@ -249,25 +248,25 @@
                 e.preventDefault();
             });
 			DECKBOTTOM.addEventListener("drop", function(e) {
-				if(DRAG_IMAGE_ELEMENT!==null){
+				if(drag_image_element!==null){
 					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
 					// デッキリストの末尾にカード番号を追加
-					var card_number = card_number_from_image_path(DRAG_IMAGE_ELEMENT.dataset.card)
+					var card_number = card_number_from_image_path(drag_image_element.dataset.card)
 					deck_list.push(card_number);
 					// ドロップ元の画像をブランクに変更してblank属性付与
-					DRAG_IMAGE_ELEMENT.dataset.card = "";
-					DRAG_IMAGE_ELEMENT.src = blank_img_src;
-					DRAG_IMAGE_ELEMENT.classList.add("blank");
+					drag_image_element.dataset.card = "";
+					drag_image_element.src = BLANK_IMG_SRC;
+					drag_image_element.classList.add("blank");
 					// 初期化
-					DRAG_IMAGE_ELEMENT = null;
+					drag_image_element = null;
 				}
 			});
 
 			// デッキからblankの手札に1ドロー
 			var blank_hand_cards = document.getElementsByClassName("card hand blank");
-			var draw_button = document.getElementById("DrawButton");
+			var DRAW_BUTTON = document.getElementById("DrawButton");
 			// ドローしたカードの画像に切り替える
-			draw_button.addEventListener("click", function() {
+			DRAW_BUTTON.addEventListener("click", function() {
 				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
 				if(deck_list.length>0){
 					for (var i = 0; i < blank_hand_cards.length; i++) {
@@ -301,12 +300,12 @@
 
 			// ドン追加
 			var blank_don_cards = document.getElementsByClassName("card fieldcard don blank");
-			var add_don_button = document.getElementById("AddDonButton");
+			var ADD_DON_BUTTON = document.getElementById("AddDonButton");
 			// ドンカードの画像に切り替える
-			add_don_button.addEventListener("click", function() {
+			ADD_DON_BUTTON.addEventListener("click", function() {
 				// 最も若いインデックスをブランクからドンカードに変える
 				if(blank_don_cards.length!==0){
-					blank_don_cards[0].src = don_img_src;
+					blank_don_cards[0].src = DON_IMG_SRC;
 					blank_don_cards[0].classList.add("fielddon");
 					blank_don_cards[0].classList.remove("blank");
 				}
@@ -314,13 +313,13 @@
 
 			// ドン減少
 			var don_cards = document.getElementsByClassName("card fieldcard don fielddon");
-			var remove_don_button = document.getElementById("RemoveDonButton");
+			var REMOVE_DON_BUTTON = document.getElementById("RemoveDonButton");
 			// ブランク画像に切り替える
-			remove_don_button.addEventListener("click", function() {
+			REMOVE_DON_BUTTON.addEventListener("click", function() {
 				// 最も大きいインデックスをドンカードからブランクに変える
 				if(don_cards.length!==0){
 					max_index_field_don = don_cards[don_cards.length-1];
-					max_index_field_don.src = blank_img_src;
+					max_index_field_don.src = BLANK_IMG_SRC;
 					max_index_field_don.classList.remove("fielddon");
 					max_index_field_don.classList.add("blank");
 				}
@@ -328,8 +327,8 @@
 
 			// ライフ追加
 			var blank_life_cards = document.getElementsByClassName("card life blank");
-			var add_life_button = document.getElementById("AddLifeButton");
-			add_life_button.addEventListener("click", function() {
+			var ADD_LIFE_BUTTON = document.getElementById("AddLifeButton");
+			ADD_LIFE_BUTTON.addEventListener("click", function() {
 				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
 				if(deck_list.length>0){
 					for (var i = 0; i < blank_life_cards.length; i++) {
@@ -339,7 +338,7 @@
 							// ライフに追加したカードの情報をdata-card属性に保存
 							blank_life_cards[i].dataset.card = "images/cards/" + card_number + ".png";
 							// カード画像を裏面に変更
-							blank_life_cards[i].src = face_down_img_src
+							blank_life_cards[i].src = FACE_DOWN_IMG_SRC
 							blank_life_cards[i].classList.remove("blank");
 							return
 						}
@@ -349,8 +348,8 @@
 
 			// デッキ読み込み
 			// mokeymokeyの画像出力URLからデッキリストを作製してリストに放り込む
-			var deck_set_button = document.getElementById("DeckSetButton");
-			deck_set_button.addEventListener("click", function() {
+			var ADD_LIFE_BUTTON = document.getElementById("DeckSetButton");
+			ADD_LIFE_BUTTON.addEventListener("click", function() {
 				var deck_url_input = document.getElementById("DeckURLInput").value;
 				// URLからデッキ内容だけを分離
 				var regex = /\[(.*?)\]/
