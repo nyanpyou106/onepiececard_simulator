@@ -2,13 +2,13 @@
 <html>
 <head>
 	<title>Card Game Simulator</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css">
 		body {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			height: 100vh;
 		}
 		.baseframe {
 			display: flex;
@@ -16,13 +16,25 @@
 		}
 		.subframeleft {
 			width: 15%;
-			padding-left: 2.5%;
 		}
 		.mainframe {
 			width: 70%;
 		}
 		.subframeright {
 			width: 15%;
+		}
+		.life {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+		}
+		.leader {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
 		}
 		.card-container {
 			display: flex;
@@ -32,10 +44,42 @@
 			gap: 10px;
 			margin-bottom: 20px;
 		}
+		.controls {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+		.stack {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+		.trash {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+		.deck {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
 		.card {
 			display: inline-block;
-			height: 150px;
-			width: 100px;
+			height: 120px;
+			width: 80px;
 			background-repeat: no-repeat;
 			background-size: contain;
 			background-position: center;
@@ -43,8 +87,8 @@
 		}
 		.field {
 			display: inline-block;
-			height: 210px;
-			width: 140px;
+			height: 180px;
+			width: 120px;
 			padding-left: 30px;
 			padding-right: 30px;
 			background-repeat: no-repeat;
@@ -53,8 +97,16 @@
 			transition: transform 0.5s;
 		}
 		.leadercard {
-			height: 300px;
-			width: 200px;
+			height: 270px;
+			width: 180px;
+		}
+		.trashcard {
+			height: 147px;
+			width: 98px;
+		}
+		.deckcard {
+			height: 147px;
+			width: 98px;
 		}
 		.card.rotate {
 			transform: rotateZ(90deg);
@@ -72,7 +124,7 @@
 		input {
 			margin-top: 10px;
 			padding: 5px 10px;
-			font-size: 18px;
+			font-size: 15px;
 			border-radius: 5px;
 		}
 	</style>
@@ -179,6 +231,27 @@
 
 			// ドン減少
 
+			// ライフ追加
+			var blank_life_cards = document.getElementsByClassName("card life blank");
+			var add_life_button = document.getElementById("AddLifeButton");
+			add_life_button.addEventListener("click", function() {
+				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
+				if(deck_list.length>0){
+					for (var i = 0; i < blank_life_cards.length; i++) {
+						if(blank_life_cards[i].classList.contains("blank")){
+							// デッキリストの先頭を抜き出す
+							var card_number = deck_list.shift();
+							// ライフに追加したカードの情報をdata-card属性に保存
+							blank_life_cards[i].dataset.card = "images/cards/" + card_number + ".png";
+							// カード画像を裏面に変更
+							blank_life_cards[i].src = face_down_img_src
+							blank_life_cards[i].classList.remove("blank");
+							return
+						}
+					}
+				}
+			});
+
 			// デッキ読み込み
 			// mokeymokeyの画像出力URLからデッキリストを作製してリストに放り込む
 			var deck_set_button = document.getElementById("DeckSetButton");
@@ -208,12 +281,13 @@
 	<div class="baseframe">
 		<div class="subframeleft">
 			<div class="life">
-				<img src="images/blank-image.jpg" class="card life blank"></img>
-				<img src="images/blank-image.jpg" class="card life blank"></img>
-				<img src="images/blank-image.jpg" class="card life blank"></img>
-				<img src="images/blank-image.jpg" class="card life blank"></img>
-				<img src="images/blank-image.jpg" class="card life blank"></img>
-				<img src="images/blank-image.jpg" class="card life blank"></img>
+				<!--srcでブランクを表示しつつdata-cardにカードの情報を保存しておく-->
+				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
 			</div>
 			<div class="leader">
 				<img src="images/face-down-image.jpg" id="myleader" class="card fieldcard leadercard blank"></img>
@@ -263,9 +337,16 @@
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
 			</div>
+			<div class="controls">
+				<button id="DrawButton">1枚引く</button>
+				<button id="AddDonButton">+1ドン</button>
+				<button id="AddLifeButton">+1ライフ</button>
+				<input id="DeckURLInput" type="text" value="https://mokeymokey.com/simulator/make_image?decklist=[%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-011%22,%22ST01-011%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22]&leader=OP01-002"></input>
+				<button id="DeckSetButton">デッキ読み込み</button>
+			</div>
 		</div>
 		<div class="subframeright">
-			<div>
+			<div class="stack">
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
@@ -273,12 +354,12 @@
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
 				<img src="images/blank-image.jpg" class="card hand blank" draggable="true"></img>
 			</div>
-			<button id="DrawButton">1枚引く</button>
-			<button id="AddDonButton">1ドン増やす</button>
-			<input id="DeckURLInput" type="text" value="https://mokeymokey.com/simulator/make_image?decklist=[%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-011%22,%22ST01-011%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22]&leader=OP01-002"></input>
-			<button id="DeckSetButton">デッキ読み込み</button>
 			<div class="trash">
-				<img src="images/face-down-image.jpg" class="card blank"></img>
+				<img src="images/trash-image.jpg" class="trashcard"></img>
+			</div>
+			<div class="deck">
+				<img src="images/deck-top-image.jpg" class="deckcard"></img>
+				<img src="images/deck-bottom-image.jpg" class="deckcard"></img>
 			</div>
 		</div>
 	</div>
