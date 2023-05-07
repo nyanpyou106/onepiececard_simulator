@@ -144,6 +144,11 @@
   			return array;
 		}
 
+		function card_number_from_image_path(path) {
+			var file_name = path.split("/").pop()
+			return file_name.split(".")[0]
+		}
+
 		// 処理本体
 		var blank_img_src = "images/blank-image.jpg";
 		var face_down_img_src = "images/face-down-image.jpg";
@@ -201,13 +206,53 @@
 				});
 			}
 			// トラッシュでの動作
-			trash = document.getElementById("trash")
+			var trash = document.getElementById("trash")
 			trash.addEventListener("dragover", function(e) {
                 e.preventDefault();
             });
 			trash.addEventListener("drop", function(e) {
 				if(DRAG_IMAGE_ELEMENT!==null){
 					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
+					// ドロップ元の画像をブランクに変更してblank属性付与
+					DRAG_IMAGE_ELEMENT.dataset.card = "";
+					DRAG_IMAGE_ELEMENT.src = blank_img_src;
+					DRAG_IMAGE_ELEMENT.classList.add("blank");
+					// 初期化
+					DRAG_IMAGE_ELEMENT = null;
+				}
+			});
+
+			// デッキ上での動作
+			var DECKTOP = document.getElementById("decktop")
+			DECKTOP.addEventListener("dragover", function(e) {
+                e.preventDefault();
+            });
+			DECKTOP.addEventListener("drop", function(e) {
+				if(DRAG_IMAGE_ELEMENT!==null){
+					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
+					// デッキリストの先頭にカード番号を追加
+					var card_number = card_number_from_image_path(DRAG_IMAGE_ELEMENT.dataset.card)
+					deck_list.unshift(card_number);
+					// ドロップ元の画像をブランクに変更してblank属性付与
+					DRAG_IMAGE_ELEMENT.dataset.card = "";
+					DRAG_IMAGE_ELEMENT.src = blank_img_src;
+					DRAG_IMAGE_ELEMENT.classList.add("blank");
+					// 初期化
+					DRAG_IMAGE_ELEMENT = null;
+				}
+			});
+
+			// デッキ下での動作
+			var DECKBOTTOM = document.getElementById("deckbottom")
+			DECKBOTTOM.addEventListener("dragover", function(e) {
+                e.preventDefault();
+            });
+			DECKBOTTOM.addEventListener("drop", function(e) {
+				if(DRAG_IMAGE_ELEMENT!==null){
+					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
+					// デッキリストの末尾にカード番号を追加
+					var card_number = card_number_from_image_path(DRAG_IMAGE_ELEMENT.dataset.card)
+					deck_list.push(card_number);
 					// ドロップ元の画像をブランクに変更してblank属性付与
 					DRAG_IMAGE_ELEMENT.dataset.card = "";
 					DRAG_IMAGE_ELEMENT.src = blank_img_src;
@@ -331,6 +376,7 @@
 		<div class="subframeleft">
 			<div class="life">
 				<!--srcでブランクを表示しつつdata-cardにカードの情報を保存しておく-->
+				<!--data-cardにはそのカードの表面画像のパスを入れておく-->
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
