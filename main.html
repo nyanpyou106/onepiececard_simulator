@@ -14,6 +14,7 @@
 			display: flex;
 			flex-direction: row;
 		}
+		
 		.subframeleft {
 			width: 15%;
 		}
@@ -22,6 +23,16 @@
 		}
 		.subframeright {
 			width: 15%;
+		}
+		.overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+			z-index: 9999;
+			display: none;
 		}
 		.life {
 			display: flex;
@@ -101,9 +112,13 @@
 			height: 270px;
 			width: 180px;
 		}
-		.trashcard {
+		.trashcard_field {
 			height: 147px;
 			width: 98px;
+		}
+		.trashcard {
+			height: 105px;
+			width: 70px;
 		}
 		.deckcard {
 			height: 147px;
@@ -417,7 +432,22 @@
 					stacks[i].className = "card stack blank"
 				}
 			})
-        }
+
+			// トラッシュのオーバーレイ表示非表示
+			var TRASH = document.getElementById("trash");
+			var TRASH_OVERLAY = document.getElementById("trash_overlay")
+			var TRASH_CLOSE_BUTTON = document.getElementById("TrashOverlayCloseButton")
+			TRASH.addEventListener("click", function() {
+				if(TRASH_OVERLAY.style.display="none"){
+					TRASH_OVERLAY.style.display="block";
+				}
+			})
+			TRASH_CLOSE_BUTTON.addEventListener("click", function(){
+				if(TRASH_OVERLAY.style.display="block"){
+					TRASH_OVERLAY.style.display="none";
+				}
+			})
+		}
 	</script>
 </head>
 <body>
@@ -507,8 +537,73 @@
 				<img src="images/deck-bottom-image.jpg" id="deckbottom" class="deckcard"></img>
 			</div>
 			<div class="trash" id="trash_area">
-				<img src="images/trash-image.jpg" id="trash" class="trashcard"></img>
+				<img src="images/trash-image.jpg" id="trash" class="trashcard_field"></img>
 			</div>
+		</div>
+		<div class="overlay" id="trash_overlay">
+			<div class="card-container" id=trash1_area">
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+			</div>
+			<div class="card-container" id="trash2_area">
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+			</div>
+			<div class="card-container" id="trash3_area">
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+			</div>
+			<div class="card-container" id="trash4_area">
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+			</div>
+			<div class="card-container" id="trash5_area">
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
+			</div>
+			<div class="controls">
+				<button id="TrashOverlayCloseButton">閉じる</button>
+			</div>	
 		</div>
 	</div>
 </body>
