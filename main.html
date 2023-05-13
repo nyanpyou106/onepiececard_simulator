@@ -154,6 +154,8 @@
 		var FACE_DOWN_IMG_SRC = "images/face-down-image.jpg";
 		var DON_IMG_SRC = "images/don-image.jpg";
 		var deck_list = [];
+		// 読み込み直後のデッキリスト。初期状態の戻す時に使う。
+		var full_deck_list = [];
 
         window.onload = function() {
 			// カード回転
@@ -358,6 +360,7 @@
 				deck_list = deck_list.replace(/%22/g, "");
 				// シャッフルしつつdeck_listに投入
 				deck_list = shuffle_array(deck_list.split(","));
+				full_deck_list = deck_list.concat();
 				// URLからリーダーカードだけを分離
 				var regex = /&leader=([^&]+)/;
 				var leader_card_number = deck_url_input.match(regex)[1];
@@ -367,14 +370,60 @@
 				leader_card.src = "images/cards/" + leader_card_number + ".png";
 			});
 
-
+			// 盤面リセット
+			var RESET_BUTTON = document.getElementById("ResetButton");
+			RESET_BUTTON.addEventListener("click", function() {
+				deck_list = full_deck_list.concat();
+				// ライフ
+				var lifes = document.getElementById("life_area").querySelectorAll("img");
+				for(var i = 0; i < lifes.length; i++){
+					lifes[i].src = BLANK_IMG_SRC;
+					lifes[i].dataset.card = "";
+					lifes[i].className = "card life blank"
+				}
+				// フィールド
+				var field_cards = document.getElementById("field_area").querySelectorAll("img");
+				for(var i = 0; i < field_cards.length; i++){
+					field_cards[i].src = BLANK_IMG_SRC;
+					field_cards[i].dataset.card = "";
+					field_cards[i].className = "card fieldcard field blank"
+				}
+				// ドン
+				var dons = document.getElementById("don_area").querySelectorAll("img");
+				for(var i = 0; i < dons.length; i++){
+					dons[i].src = BLANK_IMG_SRC;
+					dons[i].dataset.card = "don";
+					dons[i].className = "card fieldcard don blank"
+				}
+				// 手札1
+				var hand1s = document.getElementById("hand1_area").querySelectorAll("img");
+				for(var i = 0; i < hand1s.length; i++){
+					hand1s[i].src = BLANK_IMG_SRC;
+					hand1s[i].dataset.card = "";
+					hand1s[i].className = "card hand blank"
+				}
+				// 手札2
+				var hand2s = document.getElementById("hand2_area").querySelectorAll("img");
+				for(var i = 0; i < hand2s.length; i++){
+					hand2s[i].src = BLANK_IMG_SRC;
+					hand2s[i].dataset.card = "";
+					hand2s[i].className = "card hand blank"
+				}
+				// スタック
+				var stacks = document.getElementById("stack_area").querySelectorAll("img");
+				for(var i = 0; i < stacks.length; i++){
+					stacks[i].src = BLANK_IMG_SRC;
+					stacks[i].dataset.card = "";
+					stacks[i].className = "card stack blank"
+				}
+			})
         }
 	</script>
 </head>
 <body>
 	<div class="baseframe">
 		<div class="subframeleft">
-			<div class="life">
+			<div class="life" id="life_area">
 				<!--srcでブランクを表示しつつdata-cardにカードの情報を保存しておく-->
 				<!--data-cardにはそのカードの表面画像のパスを入れておく-->
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
@@ -389,14 +438,14 @@
 			</div>
 		</div>
 		<div class="mainframe">
-			<div class="card-container">
+			<div class="card-container" id="field_area">
 				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card fieldcard field blank"></img>
 			</div>
-			<div class="card-container">
+			<div class="card-container" id="don_area">
 				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
 				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
 				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
@@ -408,7 +457,7 @@
 				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
 				<img src="images/blank-image.jpg" data-card="don" class="card fieldcard don blank"></img>
 			</div>
-			<div class="card-container">
+			<div class="card-container" id="hand1_area">
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
@@ -420,7 +469,7 @@
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 			</div>
-			<div class="card-container">
+			<div class="card-container" id="hand2_area">
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card hand blank"></img>
@@ -438,12 +487,13 @@
 				<button id="RemoveDonButton">-1ドン</button>
 				<button id="AddLifeButton">+1ライフ</button>
 				<button id="CheckDeckTopButton">デッキ上確認</button>
+				<button id="ResetButton">盤面リセット</button>
 				<input id="DeckURLInput" type="text" value="https://mokeymokey.com/simulator/make_image?decklist=[%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-006%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-016%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-025%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-029%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP01-047%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-005%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-015%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22OP02-043%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-006%22,%22ST01-011%22,%22ST01-011%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-004%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-007%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22,%22ST02-009%22]&leader=OP01-002"></input>
 				<button id="DeckSetButton">デッキ読み込み</button>
 			</div>
 		</div>
 		<div class="subframeright">
-			<div class="stack">
+			<div class="stack" id="stack_area">
 				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
@@ -451,11 +501,11 @@
 				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card stack blank"></img>
 			</div>
-			<div class="deck">
+			<div class="deck" id="deck_area">
 				<img src="images/deck-top-image.jpg" id="decktop" class="deckcard"></img>
 				<img src="images/deck-bottom-image.jpg" id="deckbottom" class="deckcard"></img>
 			</div>
-			<div class="trash">
+			<div class="trash" id="trash_area">
 				<img src="images/trash-image.jpg" id="trash" class="trashcard"></img>
 			</div>
 		</div>
