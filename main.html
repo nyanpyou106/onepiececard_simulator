@@ -161,7 +161,11 @@
 
 		function card_number_from_image_path(path) {
 			var file_name = path.split("/").pop()
-			return file_name.split(".")[0]
+			return file_name.split(".")[0];
+		}
+
+		function image_path_from_card_number(card_number) {
+			return "images/cards/" + card_number + ".png";
 		}
 
 		// 処理本体
@@ -171,6 +175,24 @@
 		var deck_list = [];
 		// 読み込み直後のデッキリスト。初期状態の戻す時に使う。
 		var full_deck_list = [];
+		var trash_list = [];
+
+		// スタックのオーバーレイの画像をリセット
+		function reset_trash_overlay(){
+			var trash1 = document.getElementById("trash1_area").querySelectorAll("img");
+			var trash2 = document.getElementById("trash2_area").querySelectorAll("img");
+			var trash3 = document.getElementById("trash3_area").querySelectorAll("img");
+			var trash4 = document.getElementById("trash4_area").querySelectorAll("img");
+			var trash5 = document.getElementById("trash5_area").querySelectorAll("img");
+			trash_areas = [trash1, trash2, trash3, trash4, trash5];
+			for(var i = 0; i < trash_areas.length; i++){
+				for(var s = 0; s < trash_areas[i].length; s++){
+					trash_areas[i][s].src = BLANK_IMG_SRC;
+					trash_areas[i][s].dataset.card = "";
+					trash_areas[i][s].className = "card trashcard blank"
+				}
+			}
+		}
 
         window.onload = function() {
 			// カード回転
@@ -222,6 +244,7 @@
 					}
 				});
 			}
+
 			// トラッシュでの動作
 			var TRASH = document.getElementById("trash")
 			TRASH.addEventListener("dragover", function(e) {
@@ -230,6 +253,9 @@
 			TRASH.addEventListener("drop", function(e) {
 				if(drag_image_element!==null){
 					// ドラッグ元がnullじゃない(ドラッグ出来ている)時だけドロップ可能。
+					// トラッシュリストの先頭にカード番号を追加
+					var card_number = card_number_from_image_path(drag_image_element.dataset.card)
+					trash_list.push(card_number);
 					// ドロップ元の画像をブランクに変更してblank属性付与
 					drag_image_element.dataset.card = "";
 					drag_image_element.src = BLANK_IMG_SRC;
@@ -238,6 +264,33 @@
 					drag_image_element = null;
 				}
 			});
+			// トラッシュのオーバーレイ表示非表示
+			var TRASH = document.getElementById("trash");
+			var TRASH_OVERLAY = document.getElementById("trash_overlay")
+			var TRASH_CLOSE_BUTTON = document.getElementById("TrashOverlayCloseButton")
+			TRASH.addEventListener("click", function() {
+				if(TRASH_OVERLAY.style.display="none"){
+					TRASH_OVERLAY.style.display="block";
+					// トラッシュがある時だけ動作
+					if(trash_list.length > 0){
+						// 表示された時にオーバーレイにトラッシュのカードを表示。
+						for (var i = 0; i < trash_list.length; i++) {
+							var blank_trash_cards = document.getElementsByClassName("card trashcard blank");
+							blank_trash_cards[0].dataset.card = image_path_from_card_number(trash_list[i]);
+							blank_trash_cards[0].src = blank_trash_cards[0].dataset.card;
+							blank_trash_cards[0].classList.remove("blank");
+						}
+					}
+				}
+			})
+			TRASH_CLOSE_BUTTON.addEventListener("click", function(){
+				if(TRASH_OVERLAY.style.display="block"){
+					TRASH_OVERLAY.style.display="none";
+					// TODO:表示されているカードを読み取ってtrash_listを更新する。
+					// 閉じた時にトラッシュに表示されているカードを全部ブランクに変更。
+					reset_trash_overlay();
+				}
+			})
 
 			// デッキ上での動作
 			var DECKTOP = document.getElementById("decktop")
@@ -286,10 +339,11 @@
 			DRAW_BUTTON.addEventListener("click", function() {
 				// デッキが読み込まれている時(残り枚数がある時)だけ動作する
 				if(deck_list.length>0){
+					// TODO:ここforじゃなくていい気がする
 					for (var i = 0; i < blank_hand_cards.length; i++) {
 						// デッキリストの先頭を抜き出して手札に画像を表示
 						var card_number = deck_list.shift();
-						blank_hand_cards[i].dataset.card = "images/cards/" + card_number + ".png";
+						blank_hand_cards[i].dataset.card = image_path_from_card_number(card_number);
 						blank_hand_cards[i].src = blank_hand_cards[i].dataset.card;
 						blank_hand_cards[i].classList.remove("blank");
 						return
@@ -353,7 +407,7 @@
 							// デッキリストの先頭を抜き出す
 							var card_number = deck_list.shift();
 							// ライフに追加したカードの情報をdata-card属性に保存
-							blank_life_cards[i].dataset.card = "images/cards/" + card_number + ".png";
+							blank_life_cards[i].dataset.card = image_path_from_card_number(card_number);
 							// カード画像を裏面に変更
 							blank_life_cards[i].src = FACE_DOWN_IMG_SRC
 							blank_life_cards[i].classList.remove("blank");
@@ -432,21 +486,6 @@
 					stacks[i].className = "card stack blank"
 				}
 			})
-
-			// トラッシュのオーバーレイ表示非表示
-			var TRASH = document.getElementById("trash");
-			var TRASH_OVERLAY = document.getElementById("trash_overlay")
-			var TRASH_CLOSE_BUTTON = document.getElementById("TrashOverlayCloseButton")
-			TRASH.addEventListener("click", function() {
-				if(TRASH_OVERLAY.style.display="none"){
-					TRASH_OVERLAY.style.display="block";
-				}
-			})
-			TRASH_CLOSE_BUTTON.addEventListener("click", function(){
-				if(TRASH_OVERLAY.style.display="block"){
-					TRASH_OVERLAY.style.display="none";
-				}
-			})
 		}
 	</script>
 </head>
@@ -456,6 +495,7 @@
 			<div class="life" id="life_area">
 				<!--srcでブランクを表示しつつdata-cardにカードの情報を保存しておく-->
 				<!--data-cardにはそのカードの表面画像のパスを入れておく-->
+				<!--srcとdata-cardの2か所に画像パスを保存することで裏向きカードを表現する-->
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card life blank"></img>
@@ -541,7 +581,7 @@
 			</div>
 		</div>
 		<div class="overlay" id="trash_overlay">
-			<div class="card-container" id=trash1_area">
+			<div class="card-container" id="trash1_area">
 				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
 				<img src="images/blank-image.jpg" data-card="" class="card trashcard blank"></img>
