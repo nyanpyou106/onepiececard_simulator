@@ -10,6 +10,7 @@ class CardSeries(Enum):
     OP01 = ("OP01", 121)
     OP02 = ("OP02", 121)
     OP03 = ("OP03", 123)
+    OP04 = ("OP04", 119)
     ST01 = ("ST01", 17)
     ST02 = ("ST02", 17)
     ST03 = ("ST03", 17)
